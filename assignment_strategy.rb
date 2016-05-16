@@ -14,7 +14,9 @@ class AssignmentStrategy
     Machine.new(server)
   end
 
-
+  def current_turn
+    server.current_turn
+  end
 
 
 

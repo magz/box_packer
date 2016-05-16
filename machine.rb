@@ -3,7 +3,6 @@ class Machine
   def initialize(server)
     @server = server
     @id = server.create_machine['id']
-    @new_jobs = []
   end
 
   def totally_free?
@@ -14,13 +13,26 @@ class Machine
     raise 'undefined'
   end
 
+  def current_turn
+    server.current_turn
+  end
+
+  def assigned_jobs_log
+    @assigned_jobs_log ||= Hash.new {|h,k| h[k] = [] }
+  end
+
+  def new_jobs
+    assigned_jobs_log[current_turn]
+  end
+
   def total_memory
     64
   end
 
-  def available_memory(turn)
+  def available_memory
     total_memory - assigned_jobs.select {|j| j.active_at_turn?(turn) }.map(&:memory_cost)
   end
+
 
   def assign_job(job)
     new_jobs.push(job)
@@ -30,7 +42,6 @@ class Machine
     unless new_jobs.empty?
       server.assign_jobs(self, new_jobs)
     end
-    @new_jobs = []
   end
 end
 

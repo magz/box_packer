@@ -49,6 +49,10 @@ class ServerAccessor
     @current_turn_info = JSON.parse(turn_json)
   end
 
+  def current_turn
+    current_turn_info['current_turn'].to_i
+  end
+
   def get_game_info
     game_json = RestClient.get("#{host}/games/#{game['id']}",).body
     puts game_json
