@@ -79,6 +79,8 @@ class GameRunner
         AlwaysMakeNewMachineStrategy.new(server)
       when 'as_needed'
         MakeNewMachinesWhenNeededStrategy.new(server)
+      when 'improved'
+        ImprovedStrategy.new(server)
       else
         raise 'strategy not found'
       end
