@@ -16,18 +16,23 @@ class GameRunner
   def run
     start_game
     while(status != 'completed')
-      puts "status: #{status}"
       run_turn
     end
     output_final_result
   end
 
   def output_final_result
+    efficiences = assignment_strategy.retired_machines.map(&:efficiency)
+    average_efficiency = 
+      efficiences.inject{ |sum, el| sum + el }.to_f / efficiences.size
+    debugger
     completed_game_info = server.get_game_info
     puts "\n\n"
     puts "COMPLETED GAME WITH:"
     puts "Total delay: #{completed_game_info['delay_turns']} turns"
     puts "Total cost: $#{completed_game_info['cost']}"
+    puts "Average Efficiency: #{average_efficiency}"
+    puts "Efficiencies: #{efficiences}"
   end
 
   def run_turn
@@ -44,7 +49,7 @@ class GameRunner
   end
 
   def assign_jobs(new_jobs)
-    assignment_strategy('always_create_new').assign_jobs(new_jobs)
+    assignment_strategy.assign_jobs(new_jobs)
   end
 
   def start_game
@@ -63,13 +68,17 @@ class GameRunner
     current_turn_info && current_turn_info['status']
   end
 
-  def assignment_strategy(strategy)
+  def assignment_strategy
+    return(@assignment_strategy) if defined?(@assignment_strategy)
+    strategy = 'as_needed'
     @assignment_strategy ||=
       case strategy
       when 'single'
         SingleMachineStrategy.new(server)
       when 'always_create_new'
         AlwaysMakeNewMachineStrategy.new(server)
+      when 'as_needed'
+        MakeNewMachinesWhenNeededStrategy.new(server)
       else
         raise 'strategy not found'
       end
