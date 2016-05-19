@@ -11,6 +11,9 @@ class GameRunner
   attr_accessor :server
   def initialize(server)
     @server = server
+    @total_jobs_seen = 0
+    @all_jobs = []
+    @jobs_to_assign = []
   end
 
   def run
@@ -23,9 +26,9 @@ class GameRunner
 
   def output_final_result
     efficiences = assignment_strategy.retired_machines.map(&:efficiency)
-    average_efficiency = 
+    average_efficiency =
       efficiences.inject{ |sum, el| sum + el }.to_f / efficiences.size
-    debugger
+
     completed_game_info = server.get_game_info
     puts "\n\n"
     puts "COMPLETED GAME WITH:"
@@ -38,8 +41,10 @@ class GameRunner
   def run_turn
     advance_turn
     new_jobs = fetch_jobs
+
+
     log_turn
-    assign_jobs(new_jobs)
+    result = assign_jobs(new_jobs)
   end
 
   def fetch_jobs
@@ -70,7 +75,7 @@ class GameRunner
 
   def assignment_strategy
     return(@assignment_strategy) if defined?(@assignment_strategy)
-    strategy = 'as_needed'
+    strategy = 'improved'
     @assignment_strategy ||=
       case strategy
       when 'single'
@@ -87,6 +92,6 @@ class GameRunner
   end
 
   def log_turn
-    puts "On turn #{current_turn_info['current_turn']}, got #{current_turn_info['jobs'].count} jobs, having completed #{current_turn_info['jobs_completed']} of ??? with #{current_turn_info['jobs_running']} jobs running, #{current_turn_info['jobs_queued']} jobs queued, and #{current_turn_info['machines_running']} machines running"
+    puts "On turn #{current_turn_info['current_turn']}, got #{current_turn_info['jobs'].count} jobs, having completed #{current_turn_info['jobs_completed']} of #{@all_jobs.length} with #{current_turn_info['jobs_running']} jobs running, #{current_turn_info['jobs_queued']} jobs queued, and #{current_turn_info['machines_running']} machines running"
   end
 end
