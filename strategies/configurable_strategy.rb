@@ -75,7 +75,7 @@ class ConfigurableStrategy < AssignmentStrategy
   def find_best_fit_machine(job)
     case @find_best_fit_machine_strategy.to_sym
     # Use the first fit algorithim (i.e. the first machine we find that's available to take the job)
-    # This algorithm is faster (I believe n log n)
+    # This algorithm is faster (I believe n log n, or something like it)
     when :first_fit
       @available_machines.find {|machine| machine.available_memory >= job.memory_required}
     # This algorithim finds uses the bin packing Best Fit algorithm to find the machine that will have the

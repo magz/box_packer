@@ -104,7 +104,7 @@ class GameRunner
     # particularly to implement other assignment strategies fundamentally different from that used in the
     # ConfigurableStrategy
     return(@assignment_strategy) if defined?(@assignment_strategy)
-    strategy = 'configurable'
+    strategy = 'single'
     @assignment_strategy ||=
       case strategy
       when 'single'
@@ -119,8 +119,8 @@ class GameRunner
   end
 
   def log_turn
-    if (current_turn_info['current_turn'] % 25 == 0)
+    # if (current_turn_info['current_turn'] % 25 == 0)
       puts "On turn #{current_turn_info['current_turn']}, got #{current_turn_info['jobs'].count} jobs, having completed #{current_turn_info['jobs_completed']} of #{@all_jobs.length} with #{current_turn_info['jobs_running']} jobs running, #{current_turn_info['jobs_queued']} jobs queued, and #{current_turn_info['machines_running']} machines running"
-    end
+    # end
   end
 end

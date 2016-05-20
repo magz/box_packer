@@ -15,7 +15,8 @@ class ServerAccessor
   def start_game
     game_json = RestClient.post(
       "#{host}/games",
-      { long: true }
+      {}
+      # { long: true }
     ).body
     @game = JSON.parse(game_json)
   end

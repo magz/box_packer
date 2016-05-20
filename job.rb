@@ -5,5 +5,4 @@ class Job
     @memory_required = memory_required
     @turns_required = turns_required
   end
-
 end
