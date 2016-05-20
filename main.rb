@@ -6,50 +6,18 @@ require './server_accessor.rb'
 require './game_runner.rb'
 
 
-server = ServerAccessor.new
-GameRunner.new(server).run
-# server.start_game
-# machine = Machine.new(server.create_machine['id'])
+acceptable_cost_ratio = (ARGV[0] || 24).to_i
+find_best_fit_machine_strategy = (ARGV[1] || 'first_fit').to_sym
 
-# server.advance_turn
-# turn = server.current_turn_info
-# jobs_found = turn['jobs'].count
-
-# status = server.current_turn_info['status']
-
-# while (status != 'completed')
-#   turn = server.current_turn_info
-#   puts "On turn #{turn['current_turn']}, got #{turn['jobs'].count} jobs, having completed #{turn['jobs_completed']} of #{jobs_found} with #{turn['jobs_running']} jobs running, #{turn['jobs_queued']} jobs queued, and #{turn['machines_running']} machines running"
-
-#   new_jobs =
-#     server.current_turn_info['jobs'].map do |job_info|
-#       Job.new(job_info['id'], job_info['memory_required'], job_info['turns_required'])
-#     end
+params = {acceptable_cost_ratio: acceptable_cost_ratio, 
+	find_best_fit_machine_strategy: find_best_fit_machine_strategy}
 
 
-#   new_jobs.each do |job|
-#     machine.assign_job(job)
-#     machine.finalize_assignment!
-#   end
+result = GameRunner.new(params).run
 
-#   server.advance_turn
-#   turn = server.current_turn_info
-
-#   jobs_found += turn['jobs'].count
-
-#   status = server.current_turn_info['status']
-# end
-
-
-
-def cleanup_machines
-  machines.select {|m| m.totally_free? }.each {|m| server.destroy_machine(m)}
-end
-
-
-
-
-
+puts result.first
+puts result.last
+puts "=========="
 
 
 

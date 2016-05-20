@@ -1,5 +1,8 @@
 require './assignment_strategy.rb'
 
+#This was a first attempt to make a strategy that, as the name implies, creates a new machine whenver one is needed
+#It worked fine, although the configurable strategy is able to do everything that this one can
+#by setting the acceptable_cost_ratio to 0 and best_fit_strategy to first_fit
 class MakeNewMachinesWhenNeededStrategy < AssignmentStrategy
 
   attr_accessor :retired_machines
@@ -15,11 +18,7 @@ class MakeNewMachinesWhenNeededStrategy < AssignmentStrategy
   def assign_jobs(new_jobs)
     new_jobs = new_jobs.sort_by(&:memory_required).reverse
 
-    @available_machines.select(&:deleteable?).each do |machine|
-      puts "DESTROYING MACHINE: #{machine.id}"
-      retired_machines.push @available_machines.delete(machine)
-      machine.destroy!
-    end
+    destroy_unused_machines
 
     new_jobs.each do |job|
       
