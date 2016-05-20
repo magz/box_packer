@@ -18,8 +18,9 @@ class GameRunner
 
   def run
     start_game
+    leftover_jobs = []
     while(status != 'completed')
-      run_turn
+      leftover_jobs = run_turn(leftover_jobs)
     end
     output_final_result
   end
@@ -38,13 +39,14 @@ class GameRunner
     puts "Efficiencies: #{efficiences}"
   end
 
-  def run_turn
+  def run_turn(leftover_jobs=[])
     advance_turn
     new_jobs = fetch_jobs
-
+    @all_jobs += new_jobs
 
     log_turn
-    result = assign_jobs(new_jobs)
+    leftover_jobs = assign_jobs(new_jobs + leftover_jobs)
+    leftover_jobs
   end
 
   def fetch_jobs

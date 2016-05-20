@@ -4,7 +4,7 @@ class ImprovedStrategy < AssignmentStrategy
 
   attr_accessor :retired_machines, :acceptable_cost_ratio
 
-  def initialize(server, acceptable_cost_ratio=1)
+  def initialize(server, acceptable_cost_ratio=3)
     @server = server
     @available_machines = []
     @retired_machines = []
@@ -22,46 +22,62 @@ class ImprovedStrategy < AssignmentStrategy
       machine.destroy!
     end
 
-    # current_capacity = available_machines.map(&:available_memory).inject(0, &:+)
-    # total_memory_required_for_new_jobs = new_jobs.map(&:memory_required).inject(0, &:+)
-
-    assigned_jobs = []
+    @potential_carryover_jobs = []
+    
     new_jobs.each do |job|
-      candidate_machines = @available_machines.select {|machine| (machine.available_memory >= job.memory_required)}
-      if candidate_machines.length != 0
-        best_fit = candidate_machines.min {|machine| machine.available_memory}
-        best_fit.assign_job(job)
-        assigned_jobs.push job
+      potentially_assign_job(job)
+      if @potential_carryover_jobs.count >= @acceptable_cost_ratio
+        puts "threshold exceeded, creating new machine"
+        new_machine = create_machine
+        @available_machines.push new_machine
+        @potential_carryover_jobs.each do |job|
+          potentially_assign_job(job)
+        end
+        @potential_carryover_jobs = []
+        puts "potential_carryover_jobs emptied"
+        log_potential_carryover
       end
     end
-
-    new_jobs = new_jobs - assigned_jobs
-
 
 
     @available_machines.each(&:finalize_assignment!)
-    if new_jobs.count != 0
+    if @potential_carryover_jobs.count > @acceptable_cost_ratio
       debugger
     end
 
-    new_jobs
+    @potential_carryover_jobs
   end
 
-  def create_new_machine_for_jobs?(jobs)
-    jobs.length >= acceptable_cost_ratio
+  def log_potential_carryover
+      puts "potential_carryover_jobs.count: #{@potential_carryover_jobs.count}"
+      puts "potential_carryover_jobs ids: #{@potential_carryover_jobs.map(&:id)}"
   end
-
-
-  def get_assignment_proposal(available_memory, jobs)
-    proposed_jobs = []
-    jobs.each do |job|
-      if available_memory >= job.memory_required
-        proposed_jobs.push job
-        available_memory = available_memory - job.memory_required
-      else
-        return proposed_jobs
-      end
+  def potentially_assign_job(job)
+    best_fit_machine = 
+      @available_machines
+        .select {|machine| machine.available_memory >= job.memory_required }
+        .min {|machine| machine.available_memory }
+    
+    if best_fit_machine
+      best_fit_machine.assign_job job
+    else
+      @potential_carryover_jobs.push(job)
+      puts "job #{job.id} didn't fit"
+      log_potential_carryover    
     end
-    proposed_jobs
   end
+
+
+  # def get_assignment_proposal(available_memory, jobs)
+  #   proposed_jobs = []
+  #   jobs.each do |job|
+  #     if available_memory >= job.memory_required
+  #       proposed_jobs.push job
+  #       available_memory = available_memory - job.memory_required
+  #     else
+  #       return proposed_jobs
+  #     end
+  #   end
+  #   proposed_jobs
+  # end
 end
