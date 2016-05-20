@@ -12,11 +12,14 @@ class ServerAccessor
     'http://job-queue-dev.elasticbeanstalk.com'
   end
 
-  def start_game
+  def start_game(long)
+    params = {}
+    if long
+      params[:long] = true
+    end
     game_json = RestClient.post(
       "#{host}/games",
-      {}
-      # { long: true }
+      params
     ).body
     @game = JSON.parse(game_json)
   end

@@ -16,7 +16,7 @@ class GameRunner
 
   # Start the game!
   def run
-    start_game
+    start_game(@params[:long])
     # Jobs carried over between rounds
     leftover_jobs = []
 
@@ -76,8 +76,8 @@ class GameRunner
     assignment_strategy.assign_jobs(new_jobs)
   end
 
-  def start_game
-    server.start_game
+  def start_game(long=false)
+    server.start_game(long)
   end
 
   def current_turn_info
