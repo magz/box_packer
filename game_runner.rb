@@ -8,25 +8,31 @@ class GameRunner
   attr_accessor :server
   def initialize(params)
     @server = ServerAccessor.new
+    @params = params
+    
+    # These variables are only for data analysis purposes
     @total_jobs_seen = 0
     @all_jobs = []
-    @jobs_to_assign = []
-    @params = params
   end
 
+  # Start the game!
   def run
     start_game
+    # Jobs carried over between rounds
     leftover_jobs = []
-    @delay_turns = 0
+
     while(status != 'completed')
+      #pass our jobs carried over between rounds to the next round
       leftover_jobs = run_turn(leftover_jobs)
-      @delay_turns += leftover_jobs.count
     end
-    output_final_result
+    # output_final_result
+    # Return the game info hash for analysis
     game_info
   end
 
   def output_final_result
+    # How much of each machine's capacity did we end up using?  This is the main indicator
+    # of how effective an assignment algorithm is at controlling costs 
     efficiences = assignment_strategy.retired_machines.map(&:efficiency)
     average_efficiency =
       efficiences.inject{ |sum, el| sum + el }.to_f / efficiences.size
@@ -44,14 +50,15 @@ class GameRunner
     end
     puts "total_time_units: #{total_time_units}"
     min_cost = total_time_units.to_f / 64
+    # This represents a lower floor of how good any job assignment can be, though unless you have perfect input
+    # this floor could not actually be reached
     puts "min cost: #{min_cost}"
-
-    puts "hi magz"
   end
 
 
   def run_turn(leftover_jobs=[])
     advance_turn
+    # Get new jobs from the server
     new_jobs = fetch_jobs
     @all_jobs += new_jobs
 
@@ -101,9 +108,9 @@ class GameRunner
     @assignment_strategy ||=
       case strategy
       when 'single'
-        SingleMachineStrategy.new(server)
+        SingleMachineStrategy.new(server, {})
       when 'always_create_new'
-        AlwaysMakeNewMachineStrategy.new(server)
+        AlwaysMakeNewMachineStrategy.new(server, {})
       when 'configurable'
         ConfigurableStrategy.new(server, @params)
       else
@@ -112,6 +119,8 @@ class GameRunner
   end
 
   def log_turn
-    puts "On turn #{current_turn_info['current_turn']}, got #{current_turn_info['jobs'].count} jobs, having completed #{current_turn_info['jobs_completed']} of #{@all_jobs.length} with #{current_turn_info['jobs_running']} jobs running, #{current_turn_info['jobs_queued']} jobs queued, and #{current_turn_info['machines_running']} machines running"
+    if (current_turn_info['current_turn'] % 25 == 0)
+      puts "On turn #{current_turn_info['current_turn']}, got #{current_turn_info['jobs'].count} jobs, having completed #{current_turn_info['jobs_completed']} of #{@all_jobs.length} with #{current_turn_info['jobs_running']} jobs running, #{current_turn_info['jobs_queued']} jobs queued, and #{current_turn_info['machines_running']} machines running"
+    end
   end
 end

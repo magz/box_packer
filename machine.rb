@@ -1,13 +1,20 @@
 class Machine
+  TOTAL_MEMORY = 64
+  
   attr_accessor :id, :new_jobs, :server, :activated_at, :deactivated_at
   def initialize(server)
     @server = server
+    
+    # Register machine with the server and assign id
     @id = server.create_machine['id']
+
+    @new_jobs = []
+    
     @activated_at = current_turn
     @deactivated_at = nil
-    @new_jobs = []
   end
 
+  # Is the machine currently doing any work?
   def deleteable?
     occupied_memory_hash[current_turn] == 0
   end
@@ -26,7 +33,7 @@ class Machine
   end
 
   def total_memory
-    64
+    TOTAL_MEMORY
   end
 
   def occupied_memory_hash
@@ -35,10 +42,6 @@ class Machine
 
   def available_memory(turn=current_turn)
     total_memory - occupied_memory_hash[turn]
-  end
-
-  def assign_jobs(jobs)
-    jobs.each {|j| assign_job(j)}
   end
 
   def assign_job(job)
