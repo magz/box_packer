@@ -31,10 +31,7 @@ class ServerAccessor
 
   def destroy_machine(machine)
     machine_json = RestClient.delete("#{host}/games/#{game['id']}/machines/#{machine.id}")
-    result = JSON.parse(machine_json)
-    puts "this should destroy the machine"
-    puts result
-    result
+    JSON.parse(machine_json)
   end
 
   def assign_jobs(machine, jobs)
@@ -57,7 +54,6 @@ class ServerAccessor
 
   def get_game_info
     game_json = RestClient.get("#{host}/games/#{game['id']}",).body
-    puts game_json
 
     JSON.parse(game_json)
   end

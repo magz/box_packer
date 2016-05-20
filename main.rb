@@ -2,10 +2,9 @@ require 'rubygems'
 require 'bundler/setup'
 require 'debugger'
 
-require './server_accessor.rb'
 require './game_runner.rb'
 
-
+# Based on some testing I did, these seem to be good default options
 acceptable_cost_ratio = (ARGV[0] || 24).to_i
 find_best_fit_machine_strategy = (ARGV[1] || 'first_fit').to_sym
 

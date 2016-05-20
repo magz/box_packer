@@ -1,9 +1,11 @@
 require './assignment_strategy.rb'
 require 'profile'
 
+# This is the final Strategy I developed.  It allows configuration of both the maximum number of jobs
+# to carryover between rounds (which is proportional to the ratio between delay turns and cost, provided
+# that the value is not too high).
+# The find_best_fit_machine_strategy controls how to match jobs to machines, with performance tradoffs described below.
 class ConfigurableStrategy < AssignmentStrategy
-
-  attr_accessor :retired_machines, :acceptable_cost_ratio
 
   def initialize(server, params)
     super
@@ -49,7 +51,14 @@ class ConfigurableStrategy < AssignmentStrategy
     #tell each machine to send a message to the server registering the jobs we've assigned
     @available_machines.each(&:finalize_assignment!)
 
-
+    # I opted to manually control the carryover of jobs between rounds, rather than using the queing method
+    # While Machine#occupied_memory_hash would allow for placing jobs into a machine's queue, I didn't do this for a few reasons
+    # Pros (to my approach):
+      # More efficient distribution of jobs to machines in rounds, because you have more knowledge of incoming jobs
+      # Quicker scale down of unneeded machines
+    # Cons
+      # More time spent calculating job assignment
+      # More http calls to assign jobs (this is largely mitigated by batched job assignment)  
     @potential_carryover_jobs
   end
 

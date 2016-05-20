@@ -1,4 +1,3 @@
-
 require './server_accessor.rb'
 require './job.rb'
 Dir["./strategies/*.rb"].each {|file| require file }
@@ -104,7 +103,7 @@ class GameRunner
     # particularly to implement other assignment strategies fundamentally different from that used in the
     # ConfigurableStrategy
     return(@assignment_strategy) if defined?(@assignment_strategy)
-    strategy = 'single'
+    strategy = 'configurable'
     @assignment_strategy ||=
       case strategy
       when 'single'

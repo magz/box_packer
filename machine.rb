@@ -1,6 +1,6 @@
 class Machine
   TOTAL_MEMORY = 64
-  
+
   attr_accessor :id, :new_jobs, :server, :activated_at, :deactivated_at
   def initialize(server)
     @server = server
@@ -36,6 +36,11 @@ class Machine
     TOTAL_MEMORY
   end
 
+  # Each key in this hash represents the usuage during a round
+  # This is used both to keep track of machine availability, as well as analyzing machine efficiency
+  # And ability to check if they can be deleted
+
+  # If you're not familiar, the proc to Hash is a little trick that I love: if a key isn't found, it initializes it to 0
   def occupied_memory_hash
     @occupied_memory_hash ||= Hash.new {|h,k| h[k] = 0 }
   end
@@ -52,6 +57,7 @@ class Machine
     end
   end
 
+  # This is seprated from #assign_job in order to minimize http calss
   def finalize_assignment!
     unless @new_jobs.empty?
       server.assign_jobs(self, @new_jobs)
